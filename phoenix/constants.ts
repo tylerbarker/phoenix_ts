@@ -1,6 +1,6 @@
 export const globalSelf = typeof self !== "undefined" ? self : null;
 export const phxWindow = typeof window !== "undefined" ? window : null;
-export const global: Window = globalSelf || phxWindow || ({} as Window);
+export const global: Window | null = globalSelf || phxWindow || ({} as Window);
 export const DEFAULT_VSN = "2.0.0";
 export const DEFAULT_TIMEOUT = 10000;
 export const WS_CLOSE_NORMAL = 1000;
