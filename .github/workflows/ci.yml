@@ -1,0 +1,18 @@
+name: build-and-test
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  my-job:
+    name: build-and-test-job
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+
+      # run any `bun` or `bunx` command
+      - run: bun install
+      - run: bun run build:lib
+      - run: bun test
