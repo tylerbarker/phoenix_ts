@@ -17,7 +17,7 @@ This effort isn't officially endorsed by the Phoenix team, just a bit of fun. Th
 - [ ] Port longpoll.js to TypeScript
 - [ ] Port presence.js to TypeScript
 - [ ] Port socket.js to TypeScript
-- [ ] Port timer.js to TypeScript
+- [x] Port timer.js to TypeScript
 
 ## Development
 
