@@ -1,7 +1,25 @@
-import { global, XHR_STATES } from "./constants";
+import { global as globalNoIE, XHR_STATES } from "./constants";
+import type { Global, ParsedJSON, SerializableObject } from "./constants";
+import type { XDomainRequest } from "./types/global";
+
+// IE8, IE9
+const global = globalNoIE as Global & {
+  XDomainRequest?: XDomainRequest;
+};
+
+type RequestMethod = "GET" | "POST" | "PUT" | "DELETE";
+type CallbackFn = (response?: ParsedJSON) => void;
 
 export default class Ajax {
-  static request(method, endPoint, accept, body, timeout, ontimeout, callback) {
+  static request(
+    method: RequestMethod,
+    endPoint: string,
+    accept: string,
+    body: Document | XMLHttpRequestBodyInit | null,
+    timeout: number,
+    ontimeout: () => void,
+    callback: CallbackFn,
+  ): XMLHttpRequest | XDomainRequest {
     if (global.XDomainRequest) {
       let req = new global.XDomainRequest(); // IE8, IE9
       return this.xdomainRequest(
@@ -14,7 +32,7 @@ export default class Ajax {
         callback,
       );
     } else {
-      let req = new global.XMLHttpRequest(); // IE7+, Firefox, Chrome, Opera, Safari
+      let req = new self.XMLHttpRequest(); // IE7+, Firefox, Chrome, Opera, Safari
       return this.xhrRequest(
         req,
         method,
@@ -29,19 +47,19 @@ export default class Ajax {
   }
 
   static xdomainRequest(
-    req,
-    method,
-    endPoint,
-    body,
-    timeout,
-    ontimeout,
-    callback,
-  ) {
+    req: XDomainRequest,
+    method: RequestMethod,
+    endPoint: string,
+    body: Document | XMLHttpRequestBodyInit | null,
+    timeout: number,
+    ontimeout: () => void,
+    callback: CallbackFn,
+  ): XDomainRequest {
     req.timeout = timeout;
     req.open(method, endPoint);
     req.onload = () => {
       let response = this.parseJSON(req.responseText);
-      callback && callback(response);
+      callback(response);
     };
     if (ontimeout) {
       req.ontimeout = ontimeout;
@@ -55,19 +73,19 @@ export default class Ajax {
   }
 
   static xhrRequest(
-    req,
-    method,
-    endPoint,
-    accept,
-    body,
-    timeout,
-    ontimeout,
-    callback,
-  ) {
+    req: XMLHttpRequest,
+    method: RequestMethod,
+    endPoint: string,
+    accept: string,
+    body: Document | XMLHttpRequestBodyInit | null,
+    timeout: number,
+    ontimeout: () => void,
+    callback: CallbackFn,
+  ): XMLHttpRequest {
     req.open(method, endPoint, true);
     req.timeout = timeout;
     req.setRequestHeader("Content-Type", accept);
-    req.onerror = () => callback && callback(null);
+    req.onerror = () => callback(null);
     req.onreadystatechange = () => {
       if (req.readyState === XHR_STATES.complete && callback) {
         let response = this.parseJSON(req.responseText);
@@ -82,7 +100,7 @@ export default class Ajax {
     return req;
   }
 
-  static parseJSON(resp) {
+  static parseJSON(resp: string): ParsedJSON {
     if (!resp || resp === "") {
       return null;
     }
@@ -95,9 +113,9 @@ export default class Ajax {
     }
   }
 
-  static serialize(obj, parentKey) {
-    let queryStr = [];
-    for (var key in obj) {
+  static serialize(obj: SerializableObject, parentKey?: string): string {
+    let queryStr: string[] = [];
+    for (let key in obj) {
       if (!Object.prototype.hasOwnProperty.call(obj, key)) {
         continue;
       }
@@ -114,7 +132,7 @@ export default class Ajax {
     return queryStr.join("&");
   }
 
-  static appendParams(url, params) {
+  static appendParams(url: string, params: SerializableObject): string {
     if (Object.keys(params).length === 0) {
       return url;
     }

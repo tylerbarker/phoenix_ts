@@ -1,6 +1,19 @@
-export const globalSelf = typeof self !== "undefined" ? self : null;
-export const phxWindow = typeof window !== "undefined" ? window : null;
-export const global: Window | null = globalSelf || phxWindow || ({} as Window);
+export type Global = Window | WorkerGlobalScope;
+export const global: Global = self;
+
+export type ParsedJSON =
+  | number
+  | string
+  | boolean
+  | null
+  | Record<string | number, unknown>
+  | unknown[];
+
+export type SerializableObject = Record<
+  string | number,
+  string | number | boolean
+>;
+
 export const DEFAULT_VSN = "2.0.0";
 export const DEFAULT_TIMEOUT = 10000;
 export const WS_CLOSE_NORMAL = 1000;
