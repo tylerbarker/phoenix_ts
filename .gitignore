@@ -3,6 +3,9 @@
 # Build directory
 dist/
 
+# direnv
+.envrc
+
 # Logs
 
 logs

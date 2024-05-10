@@ -1,0 +1,17 @@
+name: check-for-phoenix-js-changes
+run-name: "Check for changes to Phoenix JS"
+on:
+  schedule:
+    # run every day at midnight
+    - cron: "0 6 * * *"
+jobs:
+  run-check-script:
+    name: run-check-for-phoenix-changes
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+      - run: bun install
+      - run: bun phx-changes-check.ts

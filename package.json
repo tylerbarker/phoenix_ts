@@ -16,6 +16,8 @@
   "devDependencies": {
     "@happy-dom/global-registrator": "^14.10.1",
     "@microsoft/api-extractor": "^7.43.2",
+    "@octokit/core": "^6.1.2",
+    "@octokit/types": "^13.5.0",
     "@types/bun": "latest",
     "mock-socket": "^9.3.1",
     "sinon": "^17.0.2"
