@@ -13,11 +13,13 @@ This effort isn't officially endorsed by the Phoenix team, just a bit of fun. Th
 - [x] Port constants.js to TypeScript
 - [x] Port index.js to TypeScript
 - [x] Port ajax.js to TypeScript
-- [ ] Port channel.js to TypeScript
-- [ ] Port longpoll.js to TypeScript
-- [ ] Port presence.js to TypeScript
-- [ ] Port socket.js to TypeScript
 - [x] Port timer.js to TypeScript
+- [x] Port serializer.js to TypeScript
+- [ ] Port longpoll.js to TypeScript
+- [ ] Port channel.js to TypeScript
+- [ ] Port presence.js to TypeScript
+- [ ] Port push.js to TypeScript
+- [ ] Port socket.js to TypeScript
 
 ## Development
 
