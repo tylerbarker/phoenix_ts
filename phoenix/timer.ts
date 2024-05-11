@@ -1,4 +1,4 @@
-type TimerId = number;
+export type TimerId = number;
 type TimerCallback = () => void;
 type TimerCalculation = (tries: number) => number;
 
@@ -14,10 +14,10 @@ type TimerCalculation = (tries: number) => number;
  * reconnectTimer.scheduleTimeout(); // fires after 1000 ms
  */
 export default class Timer {
-  private timer: TimerId | null = null;
-  private tries: number = 0;
-  private callback: TimerCallback;
-  private timerCalc: TimerCalculation;
+  timer: TimerId | null = null;
+  tries: number = 0;
+  callback: TimerCallback;
+  timerCalc: TimerCalculation;
 
   constructor(callback: TimerCallback, timerCalc: TimerCalculation) {
     this.callback = callback;
