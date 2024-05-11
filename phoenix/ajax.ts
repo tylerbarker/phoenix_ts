@@ -1,13 +1,27 @@
 import { global as globalNoIE, XHR_STATES } from "./constants";
 import type { Global, ParsedJSON, SerializableObject } from "./constants";
-import type { XDomainRequest } from "./types/global";
+
+export type RequestMethod = "GET" | "POST" | "PUT" | "DELETE";
+
+// IE8, IE9
+export interface XDomainRequest {
+  new (): XDomainRequest;
+  timeout: number;
+  onload: () => void;
+  onerror: () => void;
+  onprogress: () => void;
+  ontimeout: () => void;
+  responseType: string;
+  responseText: string;
+  open(method: string, url: string): void;
+  send(data?: Document | XMLHttpRequestBodyInit | null): void;
+}
 
 // IE8, IE9
 const global = globalNoIE as Global & {
   XDomainRequest?: XDomainRequest;
 };
 
-type RequestMethod = "GET" | "POST" | "PUT" | "DELETE";
 type CallbackFn = (response?: ParsedJSON) => void;
 
 export default class Ajax {
