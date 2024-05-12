@@ -15,11 +15,26 @@ This effort isn't officially endorsed by the Phoenix team, just a bit of fun. Th
 - [x] Port ajax.js to TypeScript
 - [x] Port timer.js to TypeScript
 - [x] Port serializer.js to TypeScript
+- [x] Port push.js to TypeScript
 - [ ] Port longpoll.js to TypeScript
 - [ ] Port channel.js to TypeScript
 - [ ] Port presence.js to TypeScript
-- [ ] Port push.js to TypeScript
 - [ ] Port socket.js to TypeScript
+- [ ] Circle back to `any` types after everything is ported
+- [ ] Reassess bundling targets e.g what do we need to support?
+- [ ] Configure as Hex package (minimal Elixir scaffolding)
+- [ ] Write installation documentation
+
+## Staying Up to Date
+
+I intend to release a corresponding version of this library for each Phoenix release from v1.7.12 onwards, even if the bundled JS does not change to assure compatibility.
+
+I've written a script - to be run every day by a GH Action - which:
+
+1. Checks the Phoenix repo for releases newer than our current version.
+2. If a new release is found, it raises an issue on this repo with details of any changes to the Phoenix `assets/` repo if they are present.
+
+See `phx-changes-check.ts`.
 
 ## Development
 
