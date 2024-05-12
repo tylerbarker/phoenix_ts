@@ -1,6 +1,9 @@
 export type Global = Window | WorkerGlobalScope;
 export const global: Global = self;
 
+// TODO - remove entirely in favor of above global
+export const phxWindow = self;
+
 export type ParsedJSON =
   | number
   | string
