@@ -158,29 +158,33 @@ async function main() {
       CURRENT_TAG,
       CHANGE_TRACKED_DIRECTORY,
     );
-    const title = issueTitle(latestTag);
-    let issueBodyItems = changedFiles.map(
-      (file) =>
-        `- [${(file as any).filename}](${(file as any).blob_url}): ${(file as any).status}`,
-    );
-
-    if (!issueBodyItems.length) {
-      issueBodyItems.push(
-        `No JavaScript changes detected in Phoenix ${latestTag}. Bump version to assure compatibility.`,
+    if (CURRENT_TAG !== latestTag) {
+      const title = issueTitle(latestTag);
+      let issueBodyItems = changedFiles.map(
+        (file) =>
+          `- [${(file as any).filename}](${(file as any).blob_url}): ${(file as any).status}`,
       );
+
+      if (!issueBodyItems.length) {
+        issueBodyItems.push(
+          `No JavaScript changes detected in Phoenix ${latestTag}. Bump version to assure compatibility.`,
+        );
+      }
+
+      issueBodyItems.unshift(`# Change Overview`);
+      const body = issueBodyItems.join("\n");
+
+      await maybeCreateIssue(
+        TS_OWNER,
+        TS_REPO,
+        title,
+        body,
+        ISSUE_ASSIGNEES,
+        latestTag,
+      );
+    } else {
+      console.info("phoenix_ts is up to date.");
     }
-
-    issueBodyItems.unshift(`# Change Overview`);
-    const body = issueBodyItems.join("\n");
-
-    await maybeCreateIssue(
-      TS_OWNER,
-      TS_REPO,
-      title,
-      body,
-      ISSUE_ASSIGNEES,
-      latestTag,
-    );
   } catch (error) {
     console.error(`Error: ${error.message}`);
     throw Error(error.message);
