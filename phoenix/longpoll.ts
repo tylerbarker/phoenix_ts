@@ -1,8 +1,15 @@
-import { SOCKET_STATES, TRANSPORTS } from "./constants";
-
 import Ajax from "./ajax";
+import { DEFAULT_TIMEOUT, SOCKET_STATES, TRANSPORTS } from "./constants";
+import type { AjaxRequest, AjaxRequestCallback, RequestMethod } from "./ajax";
+import type { TimerId } from "./timer";
 
-let arrayBufferToBase64 = (buffer) => {
+type PhxResponse = {
+  status: number;
+  token: string | null;
+  messages: Record<string | number, unknown>[];
+};
+
+let arrayBufferToBase64 = (buffer: ArrayBuffer) => {
   let binary = "";
   let bytes = new Uint8Array(buffer);
   let len = bytes.byteLength;
@@ -13,26 +20,34 @@ let arrayBufferToBase64 = (buffer) => {
 };
 
 export default class LongPoll {
-  constructor(endPoint) {
-    this.endPoint = null;
-    this.token = null;
-    this.skipHeartbeat = true;
-    this.reqs = new Set();
-    this.awaitingBatchAck = false;
-    this.currentBatch = null;
-    this.currentBatchTimer = null;
-    this.batchBuffer = [];
+  endPoint: string | null = null;
+  token: string | null = null;
+  timeout: number = DEFAULT_TIMEOUT;
+  skipHeartbeat: boolean = true;
+  reqs: Set<AjaxRequest> = new Set();
+  awaitingBatchAck: boolean = false;
+  currentBatch: any = null;
+  currentBatchTimer: TimerId | null = null;
+  batchBuffer: any[] = [];
+  pollEndpoint: string;
+  readyState: SOCKET_STATES = SOCKET_STATES.connecting;
+
+  onopen: (() => void) | ((event: any) => void);
+  onerror: (() => void) | ((error: any) => void);
+  onmessage: (() => void) | ((event: any) => void);
+  onclose: (() => void) | ((event: any) => void);
+
+  constructor(endPoint: string) {
+    this.pollEndpoint = this.normalizeEndpoint(endPoint);
     this.onopen = function () {}; // noop
     this.onerror = function () {}; // noop
     this.onmessage = function () {}; // noop
     this.onclose = function () {}; // noop
-    this.pollEndpoint = this.normalizeEndpoint(endPoint);
-    this.readyState = SOCKET_STATES.connecting;
     // we must wait for the caller to finish setting up our callbacks and timeout properties
     setTimeout(() => this.poll(), 0);
   }
 
-  normalizeEndpoint(endPoint) {
+  normalizeEndpoint(endPoint: string) {
     return endPoint
       .replace("ws://", "http://")
       .replace("wss://", "https://")
@@ -43,10 +58,13 @@ export default class LongPoll {
   }
 
   endpointURL() {
-    return Ajax.appendParams(this.pollEndpoint, { token: this.token });
+    return Ajax.appendParams(
+      this.pollEndpoint,
+      this.token ? { token: this.token } : {},
+    );
   }
 
-  closeAndRetry(code, reason, wasClean) {
+  closeAndRetry(code: number, reason: string, wasClean: boolean | number) {
     this.close(code, reason, wasClean);
     this.readyState = SOCKET_STATES.connecting;
   }
@@ -70,14 +88,20 @@ export default class LongPoll {
       null,
       () => this.ontimeout(),
       (resp) => {
+        let status = 0;
+        let messages: Record<string | number, unknown>[] = [];
         if (resp) {
-          var { status, token, messages } = resp;
+          let {
+            status: respStatus,
+            messages: respMessages,
+            token,
+          } = resp as PhxResponse;
+          status = respStatus;
+          messages = respMessages;
           this.token = token;
-        } else {
-          status = 0;
         }
 
-        switch (status) {
+        switch (resp && status) {
           case 200:
             messages.forEach((msg) => {
               // Tasks are what things like event handlers, setTimeout callbacks,
@@ -130,7 +154,7 @@ export default class LongPoll {
   // setTimeout 0, which optimizes back-to-back procedural
   // pushes against an empty buffer
 
-  send(body) {
+  send(body: string | ArrayBuffer) {
     if (typeof body !== "string") {
       body = arrayBufferToBase64(body);
     }
@@ -147,7 +171,7 @@ export default class LongPoll {
     }
   }
 
-  batchSend(messages) {
+  batchSend(messages: string[] | ArrayBuffer[]) {
     this.awaitingBatchAck = true;
     this.ajax(
       "POST",
@@ -155,9 +179,10 @@ export default class LongPoll {
       messages.join("\n"),
       () => this.onerror("timeout"),
       (resp) => {
+        const phxResp = resp as PhxResponse;
         this.awaitingBatchAck = false;
-        if (!resp || resp.status !== 200) {
-          this.onerror(resp && resp.status);
+        if (!phxResp || phxResp.status !== 200) {
+          this.onerror(phxResp && phxResp.status);
           this.closeAndRetry(1011, "internal server error", false);
         } else if (this.batchBuffer.length > 0) {
           this.batchSend(this.batchBuffer);
@@ -167,7 +192,7 @@ export default class LongPoll {
     );
   }
 
-  close(code, reason, wasClean) {
+  close(code: number, reason: string, wasClean: boolean | number) {
     for (let req of this.reqs) {
       req.abort();
     }
@@ -177,7 +202,7 @@ export default class LongPoll {
       { code, reason, wasClean },
     );
     this.batchBuffer = [];
-    clearTimeout(this.currentBatchTimer);
+    this.currentBatchTimer && clearTimeout(this.currentBatchTimer);
     this.currentBatchTimer = null;
     if (typeof CloseEvent !== "undefined") {
       this.onclose(new CloseEvent("close", opts));
@@ -186,8 +211,14 @@ export default class LongPoll {
     }
   }
 
-  ajax(method, contentType, body, onCallerTimeout, callback) {
-    let req;
+  ajax(
+    method: RequestMethod,
+    contentType: string,
+    body: Document | XMLHttpRequestBodyInit | null,
+    onCallerTimeout: () => void,
+    callback: AjaxRequestCallback,
+  ) {
+    let req: AjaxRequest;
     let ontimeout = () => {
       this.reqs.delete(req);
       onCallerTimeout();

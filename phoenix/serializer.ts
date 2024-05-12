@@ -6,20 +6,20 @@ export enum BINARY_KINDS {
   broadcast = 2,
 }
 
-export interface MessageMeta {
+export type MessageMeta = {
   join_ref: string | null;
   ref: string | null;
   topic: string;
   event: string;
-}
+};
 
-export interface ObjectMessage extends MessageMeta {
+export type ObjectMessage = MessageMeta & {
   payload: Record<string | number, unknown>;
-}
+};
 
-export interface BinaryMessage extends MessageMeta {
+export type BinaryMessage = MessageMeta & {
   payload: ArrayBuffer;
-}
+};
 
 export type DecodedMessage = ObjectMessage | BinaryMessage;
 export type EncodedMessage = ArrayBuffer | string;

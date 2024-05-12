@@ -16,11 +16,12 @@ This effort isn't officially endorsed by the Phoenix team, just a bit of fun. Th
 - [x] Port timer.js to TypeScript
 - [x] Port serializer.js to TypeScript
 - [x] Port push.js to TypeScript
-- [ ] Port longpoll.js to TypeScript
+- [x] Port longpoll.js to TypeScript
 - [ ] Port channel.js to TypeScript
 - [ ] Port presence.js to TypeScript
 - [ ] Port socket.js to TypeScript
 - [ ] Circle back to `any` types after everything is ported
+- [ ] Circle back to `as` type assertions after everything is ported
 - [ ] Reassess bundling targets e.g what do we need to support?
 - [ ] Configure as Hex package (minimal Elixir scaffolding)
 - [ ] Write installation documentation

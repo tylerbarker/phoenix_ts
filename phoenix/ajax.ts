@@ -1,11 +1,14 @@
 import { global as globalNoIE, XHR_STATES } from "./constants";
 import type { Global, ParsedJSON, SerializableObject } from "./constants";
 
+export type AjaxRequest = XMLHttpRequest | XDomainRequest;
+export type AjaxRequestCallback = (response?: ParsedJSON) => void;
 export type RequestMethod = "GET" | "POST" | "PUT" | "DELETE";
 
 // IE8, IE9
 export interface XDomainRequest {
   new (): XDomainRequest;
+  abort(): () => void;
   timeout: number;
   onload: () => void;
   onerror: () => void;
@@ -22,8 +25,6 @@ const global = globalNoIE as Global & {
   XDomainRequest?: XDomainRequest;
 };
 
-type CallbackFn = (response?: ParsedJSON) => void;
-
 export default class Ajax {
   static request(
     method: RequestMethod,
@@ -32,8 +33,8 @@ export default class Ajax {
     body: Document | XMLHttpRequestBodyInit | null,
     timeout: number,
     ontimeout: () => void,
-    callback: CallbackFn,
-  ): XMLHttpRequest | XDomainRequest {
+    callback: AjaxRequestCallback,
+  ): AjaxRequest {
     if (global.XDomainRequest) {
       let req = new global.XDomainRequest(); // IE8, IE9
       return this.xdomainRequest(
@@ -67,7 +68,7 @@ export default class Ajax {
     body: Document | XMLHttpRequestBodyInit | null,
     timeout: number,
     ontimeout: () => void,
-    callback: CallbackFn,
+    callback: AjaxRequestCallback,
   ): XDomainRequest {
     req.timeout = timeout;
     req.open(method, endPoint);
@@ -94,7 +95,7 @@ export default class Ajax {
     body: Document | XMLHttpRequestBodyInit | null,
     timeout: number,
     ontimeout: () => void,
-    callback: CallbackFn,
+    callback: AjaxRequestCallback,
   ): XMLHttpRequest {
     req.open(method, endPoint, true);
     req.timeout = timeout;
