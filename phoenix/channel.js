@@ -286,6 +286,30 @@ export default class Channel {
     return payload;
   }
 
+  joinRef() {
+    return this.joinPush.ref;
+  }
+
+  trigger(event, payload, ref, joinRef) {
+    let handledPayload = this.onMessage(event, payload, ref, joinRef);
+    if (payload && !handledPayload) {
+      throw new Error(
+        "channel onMessage callbacks must return the payload, modified or unmodified",
+      );
+    }
+
+    let eventBindings = this.bindings.filter((bind) => bind.event === event);
+
+    for (let i = 0; i < eventBindings.length; i++) {
+      let bind = eventBindings[i];
+      bind.callback(handledPayload, ref, joinRef || this.joinRef());
+    }
+  }
+
+  replyEventName(ref) {
+    return `chan_reply_${ref}`;
+  }
+
   /**
    * @private
    */
@@ -311,13 +335,6 @@ export default class Channel {
   /**
    * @private
    */
-  joinRef() {
-    return this.joinPush.ref;
-  }
-
-  /**
-   * @private
-   */
   rejoin(timeout = this.timeout) {
     if (this.isLeaving()) {
       return;
@@ -325,32 +342,6 @@ export default class Channel {
     this.socket.leaveOpenTopic(this.topic);
     this.state = CHANNEL_STATES.joining;
     this.joinPush.resend(timeout);
-  }
-
-  /**
-   * @private
-   */
-  trigger(event, payload, ref, joinRef) {
-    let handledPayload = this.onMessage(event, payload, ref, joinRef);
-    if (payload && !handledPayload) {
-      throw new Error(
-        "channel onMessage callbacks must return the payload, modified or unmodified",
-      );
-    }
-
-    let eventBindings = this.bindings.filter((bind) => bind.event === event);
-
-    for (let i = 0; i < eventBindings.length; i++) {
-      let bind = eventBindings[i];
-      bind.callback(handledPayload, ref, joinRef || this.joinRef());
-    }
-  }
-
-  /**
-   * @private
-   */
-  replyEventName(ref) {
-    return `chan_reply_${ref}`;
   }
 
   /**
