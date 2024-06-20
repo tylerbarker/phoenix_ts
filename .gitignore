@@ -1,5 +1,8 @@
 # Based on https://raw.githubusercontent.com/github/gitignore/main/Node.gitignore
 
+# Phoenix community types for reference during development
+phoenix.d.ts
+
 # Build directory
 dist/
 
