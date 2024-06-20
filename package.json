@@ -1,6 +1,6 @@
 {
   "name": "phoenix_ts",
-  "version": "1.7.12",
+  "version": "1.7.14",
   "description": "The unofficial TypeScript client for the Phoenix web framework.",
   "license": "MIT",
   "main": "./dist/index.js",

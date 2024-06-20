@@ -1,6 +1,6 @@
 import { Octokit } from "@octokit/core";
 
-const CURRENT_TAG = "v1.7.12";
+const CURRENT_TAG = "v1.7.14";
 const CHANGE_TRACKED_DIRECTORY = "assets/";
 const TS_OWNER = "tylerbarker";
 const TS_REPO = "phoenix_ts";

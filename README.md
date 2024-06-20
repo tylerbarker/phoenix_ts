@@ -1,6 +1,6 @@
 # phoenix_ts
 
-`phoenix_ts` is, first and foremost, an experiment and a learning exercise. It's an attempt to port the JS library bundled with the Phoenix web framework (as of v1.7.12) to TypeScript. Bundled and tested with [Bun](https://bun.sh).
+`phoenix_ts` is, first and foremost, an experiment and a learning exercise. It's an attempt to port the JS library bundled with the Phoenix web framework (as of v1.7.14) to TypeScript. Bundled and tested with [Bun](https://bun.sh).
 
 I'll be doing the same for `phoenix_live_view` in a separate repo at a later date. Great timing actually, as they just announced [a release candidate for v1.0](https://github.com/phoenixframework/phoenix_live_view/commit/d84b19c9761c8a665084a05178dfbd6de8acd6e8)!
 
@@ -17,8 +17,8 @@ This effort isn't officially endorsed by the Phoenix team, just a bit of fun. Th
 - [x] Port serializer.js to TypeScript
 - [x] Port push.js to TypeScript
 - [x] Port longpoll.js to TypeScript
-- [ ] Port channel.js to TypeScript
 - [ ] Port presence.js to TypeScript
+- [ ] Port channel.js to TypeScript
 - [ ] Port socket.js to TypeScript
 - [ ] Circle back to `any` types after everything is ported
 - [ ] Circle back to `as` type assertions after everything is ported
@@ -27,6 +27,8 @@ This effort isn't officially endorsed by the Phoenix team, just a bit of fun. Th
 - [ ] Write installation documentation
 
 ## Staying Up to Date
+
+Current Version: v1.7.14
 
 I intend to release a corresponding version of this library for each Phoenix release from v1.7.12 onwards, even if the bundled JS does not change to assure compatibility.
 
